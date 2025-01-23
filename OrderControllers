@@ -1,0 +1,70 @@
+using Domain;
+using Microsoft.AspNetCore.Mvc;
+using Services;
+
+namespace WebApiApp.Controllers
+{
+        [Route("api/[controller]")]
+        [ApiController]
+
+        public class OrdersController : ControllerBase {
+        
+        private readonly IOrderService _orderService;
+
+        public OrdersController(IOrderService orderService) {
+        _orderService = orderService;
+        }
+
+        [HttpGet]
+        public List<Order> GetAllOrders()
+        {
+            return _orderService.GetAllOrders();
+        }
+
+        [HttpGet("{id}")]
+        public Order GetOrderById(int id) {
+            return _orderService.GetOrderById(id);
+        }
+
+
+        [HttpPost]
+        public void AddOrder(Order order) 
+        {
+            _orderService.AddOrder(order);
+        }
+
+        [HttpPut("{id}")]
+        public void UpdateOrder(int id, Order order)
+        {
+            _orderService.UpdateOrder(id, order);
+        }
+
+
+        [HttpDelete("{id}")]
+        public void DeleteOrder(int id)
+        {
+            _orderService.DeleteOrder(id);
+        }
+
+        [HttpGet("customer/{customerId}")]
+        public List<Order> GetOrdersByCustomerId(int customerId)
+        {
+            return _orderService.GetOrdersByCustomerId(customerId);
+        }
+
+        [HttpGet("customer/{customerId}/totalprice")]
+        public decimal GetTotalPriceByCustomerId(int customerId)
+        {
+            return _orderService.GetTotalPriceByCustomerId(customerId);
+        }
+
+
+        [HttpGet("totalprice")]
+        public Dictionary<int, decimal> GetTotalPricePerCustomer() 
+        {
+            return _orderService.GetTotalPricePerCustomer();
+        }
+
+    }
+
+    }
