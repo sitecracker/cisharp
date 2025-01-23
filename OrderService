@@ -1,0 +1,77 @@
+using Data;
+using Domain;
+using Microsoft.EntityFrameworkCore;
+
+namespace Services
+{
+    public class OrderService : IOrderService
+    {
+        private readonly AppDbContext _dbContext;
+
+        public OrderService(AppDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
+
+        public void AddOrder(Order order)
+        {
+            _dbContext.Orders.Add(order);
+            _dbContext.SaveChanges();
+        }
+
+        public void DeleteOrder(int id)
+        {
+            var orderInDb = _dbContext.Orders.FirstOrDefault(o => o.Id == id);
+            if (orderInDb != null)
+            {
+                _dbContext.Orders.Remove(orderInDb);
+                _dbContext.SaveChanges();
+            }
+        }
+
+
+
+        public List<Order> GetAllOrders()
+        {
+            return _dbContext.Orders.ToList();
+        }
+
+
+
+        public Order GetOrderById(int id)
+        {
+            return _dbContext.Orders.FirstOrDefault(o => o.Id == id);
+        }
+
+
+        public List<Order> GetOrdersByCustomerId(int customerId)
+        {
+            return _dbContext.Orders.Where(o => o.CustomerId == customerId).ToList();
+        }
+
+        public decimal GetTotalPriceByCustomerId(int customerId)
+        {
+            return _dbContext.Orders.Where(o => o.CustomerId == customerId).Sum(o => o.Price);
+        }
+
+        public Dictionary<int, decimal> GetTotalPricePerCustomer()
+        {
+            return _dbContext.Orders.
+                GroupBy(o => o.CustomerId).
+                ToDictionary(g => g.Key, g => g.Sum(o => o.Price));
+        }
+
+        public void UpdateOrder(int id, Order order)
+        {
+            var orderInDb = _dbContext.Orders.FirstOrDefault(o => o.Id == id);
+
+            if (orderInDb != null) {
+
+                orderInDb.Product = order.Product;
+                orderInDb.Price = order.Price;
+                orderInDb.CustomerId = order.CustomerId;
+            }
+        }
+    }
+}
